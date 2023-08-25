@@ -1,7 +1,9 @@
 <div align="center">
 <h1>React Native Marquee</h1>
 
-https://github.com/catalinmiron/reanimated2-docs/assets/2805320/3b176048-8974-455a-a73d-cf8da29514f3
+https://github.com/animate-react-native/marquee/assets/2805320/4fb199b2-491c-4621-bf84-85890a8d6f5e
+
+
 
 [![NPM Version](https://img.shields.io/npm/v/@animatereactnative/marquee.svg?style=flat&color=black)](https://www.npmjs.org/package/@animatereactnative/marquee) [![runs with expo](https://img.shields.io/badge/Runs%20with%20Expo-4630EB.svg?style=flat-square&logo=EXPO&labelColor=f3f3f3&logoColor=000)](https://expo.io/) [![npm](https://img.shields.io/npm/l/@animatereactnative/marquee?style=flat-square)](https://www.npmjs.com/package/@animatereactnative/marquee) [![npm](https://img.shields.io/badge/types-included-blue?style=flat-square)](https://www.npmjs.com/package/@animatereactnative/marquee) <a href="https://twitter.com/mironcatalin"><img src="https://img.shields.io/twitter/follow/mironcatalin?label=Follow @mironcatalin&color=black" alt="Follow Miron Catalin"></a>
 
