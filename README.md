@@ -50,6 +50,7 @@ export function Example() {
 | `speed`    | Animation speed                                                            | NO       | `number`               | 1       |
 | `spacing`  | Spacing between repeting elements                                          | NO       | `number`               | 0       |
 | `style`    | View style to be applied to Marquee container.                             | NO       | `StyleProp<ViewStyle>` |         |
+| `direction`| Direction in which the repeating elements should scroll                      | NO       | `"horizontal" \| "vertical"` | `"horizontal"`   |
 
 ## Contributing
 
