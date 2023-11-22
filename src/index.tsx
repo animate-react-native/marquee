@@ -37,8 +37,8 @@ const AnimatedChild = ({
       position: 'absolute',
       top: vertical && direction === 'up' ? index * (textHeight.value + spacing) : undefined,
       bottom: vertical && direction === 'down' ? index * (textHeight.value + spacing) : undefined,
-      left: horizontal && direction === 'right' ? index * (textWidth.value + spacing) : undefined,
-      right: horizontal && direction === 'left' ? index * (textWidth.value + spacing) : undefined,
+      right: horizontal && direction === 'right' ? index * (textWidth.value + spacing) : undefined,
+      left: horizontal && direction === 'left' ? index * (textWidth.value + spacing) : undefined,
       transform: [
         {
           ...(vertical
