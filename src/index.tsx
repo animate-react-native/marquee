@@ -11,6 +11,8 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 
+type MarqueeDirection = 'up' | 'left' | 'right' | 'down';
+
 const AnimatedChild = ({
   index,
   children,
@@ -18,25 +20,30 @@ const AnimatedChild = ({
   textHeight,
   textWidth,
   spacing,
-  direction = 'horizontal',
+  direction = 'right',
 }: React.PropsWithChildren<{
   index: number;
   anim: SharedValue<number>;
   textHeight: SharedValue<number>;
   textWidth: SharedValue<number>;
   spacing: number;
-  direction?: 'horizontal' | 'vertical';
+  direction?: MarqueeDirection;
 }>) => {
   const stylez = useAnimatedStyle(() => {
+    const vertical = direction === 'up' || direction === 'down';
+    const horizontal = direction === 'left' || direction === 'right';
+
     return {
       position: 'absolute',
-      top: direction === 'vertical' ? index * (textHeight.value + spacing) : undefined,
-      left: direction === 'horizontal' ? index * (textWidth.value + spacing) : undefined,
+      top: vertical && direction === 'up' ? index * (textHeight.value + spacing) : undefined,
+      bottom: vertical && direction === 'down' ? index * (textHeight.value + spacing) : undefined,
+      left: horizontal && direction === 'right' ? index * (textWidth.value + spacing) : undefined,
+      right: horizontal && direction === 'left' ? index * (textWidth.value + spacing) : undefined,
       transform: [
         {
-          ...(direction === 'vertical'
-            ? { translateY: -(anim.value % (textHeight.value + spacing)) }
-            : { translateX: -(anim.value % (textWidth.value + spacing)) }),
+          ...(vertical
+            ? { translateY: (anim.value % (textHeight.value + spacing)) * (direction === 'up' ? -1 : 1) }
+            : { translateX: (anim.value % (textWidth.value + spacing)) * (direction === 'left' ? -1 : 1) }),
         },
       ],
     };
@@ -48,13 +55,20 @@ export type MarqueeProps = React.PropsWithChildren<{
   speed?: number;
   spacing?: number;
   style?: ViewStyle;
-  direction?: 'horizontal' | 'vertical';
+  /**
+   * Direction in which the marquee should scroll
+   */
+  direction?: MarqueeDirection;
+  /**
+   * Delay in milliseconds before the marquee starts
+   */
+  delay?: number;
 }>;
 
 /**
  * Used to animate the given children in a horizontal manner.
  */
-export const Marquee = React.memo(({ speed = 1, children, spacing = 0, style, direction = 'horizontal' }: MarqueeProps) => {
+const Marquee = React.memo(({ speed = 1, children, spacing = 0, style, delay, direction = 'right' }: MarqueeProps) => {
   const parentHeight = useSharedValue(0);
   const parentWidth = useSharedValue(0);
   const textHeight = useSharedValue(0);
@@ -62,13 +76,24 @@ export const Marquee = React.memo(({ speed = 1, children, spacing = 0, style, di
   const [cloneTimes, setCloneTimes] = React.useState(0);
   const anim = useSharedValue(0);
 
-  useFrameCallback(() => {
-    anim.value += speed;
-  }, true);
+  const animationCallback = useFrameCallback(
+    () => {
+      anim.value += speed;
+    },
+    delay ? false : true,
+  );
+
+  React.useEffect(() => {
+    if (delay) {
+      setTimeout(() => {
+        animationCallback.setActive(true);
+      }, delay);
+    }
+  }, []);
 
   useAnimatedReaction(
     () => {
-      if (direction === 'vertical') {
+      if (direction === 'up' || direction === 'down') {
         if (textHeight.value === 0 || parentHeight.value === 0) {
           return 0;
         }
@@ -86,7 +111,7 @@ export const Marquee = React.memo(({ speed = 1, children, spacing = 0, style, di
         return;
       }
 
-      if (direction === 'vertical') {
+      if (direction === 'up' || direction === 'down') {
         runOnJS(setCloneTimes)(v);
       } else {
         // This is going to cover the case when the text/element size
