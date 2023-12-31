@@ -7,9 +7,9 @@ import Animated, {
   runOnJS,
   useAnimatedReaction,
   useAnimatedStyle,
-  useFrameCallback,
   useSharedValue,
 } from 'react-native-reanimated';
+import { useEffect } from 'react';
 
 const AnimatedChild = ({
   index,
@@ -53,9 +53,20 @@ export const Marquee = React.memo(
     const [cloneTimes, setCloneTimes] = React.useState(0);
     const anim = useSharedValue(0);
 
-    useFrameCallback(() => {
-      anim.value += speed;
-    }, true);
+    useEffect(() => {
+      let frameCallbackId;
+
+      const frameCallback = () => {
+        anim.value += speed;
+        frameCallbackId = requestAnimationFrame(frameCallback);
+      };
+      frameCallback();
+      return () => {
+        if (frameCallbackId) {
+          cancelAnimationFrame(frameCallbackId);
+        }
+      };
+    }, [anim, speed]);
 
     useAnimatedReaction(
       () => {
