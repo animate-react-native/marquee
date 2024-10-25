@@ -42,6 +42,27 @@ export default function App() {
           })}
         </View>
       </Marquee>
+      <Marquee
+        enableManualScroll={true}
+        spacing={10}
+        speed={4}
+        style={{ marginTop: 12 }}
+      >
+        <View style={{ flexDirection: 'row' }}>
+          {[...Array(5).keys()].map((i) => {
+            return (
+              <Box
+                key={`box-${i}`}
+                spacing={i === 4 ? 0 : 10}
+                size={120}
+                primary={primary}
+              >
+                <Heading primary={!primary}>{i}</Heading>
+              </Box>
+            );
+          })}
+        </View>
+      </Marquee>
     </View>
   );
 }

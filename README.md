@@ -50,6 +50,9 @@ export function Example() {
 | `speed`    | Animation speed                                                            | NO       | `number`               | 1       |
 | `spacing`  | Spacing between repeting elements                                          | NO       | `number`               | 0       |
 | `style`    | View style to be applied to Marquee container.                             | NO       | `StyleProp<ViewStyle>` |         |
+| `enableManualScroll` | Is it possible to scroll manually                                | NO       | `boolean`                 | `false`      |
+
+
 
 ## Contributing
 

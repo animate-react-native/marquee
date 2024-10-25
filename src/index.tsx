@@ -4,12 +4,20 @@ import { StyleSheet } from 'react-native';
 import { View } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import Animated, {
+  cancelAnimation,
   runOnJS,
   useAnimatedReaction,
   useAnimatedStyle,
   useFrameCallback,
   useSharedValue,
+  withDecay,
 } from 'react-native-reanimated';
+import {
+  Gesture,
+  GestureDetector,
+  GestureHandlerRootView,
+  State,
+} from 'react-native-gesture-handler';
 
 const AnimatedChild = ({
   index,
@@ -41,20 +49,31 @@ export type MarqueeProps = React.PropsWithChildren<{
   speed?: number;
   spacing?: number;
   style?: ViewStyle;
+  enableManualScroll?: boolean;
 }>;
 
 /**
  * Used to animate the given children in a horizontal manner.
  */
 export const Marquee = React.memo(
-  ({ speed = 1, children, spacing = 0, style }: MarqueeProps) => {
+  ({
+    speed = 1,
+    children,
+    spacing = 0,
+    enableManualScroll = false,
+    style,
+  }: MarqueeProps) => {
     const parentWidth = useSharedValue(0);
     const textWidth = useSharedValue(0);
     const [cloneTimes, setCloneTimes] = React.useState(0);
     const anim = useSharedValue(0);
+    const isManual = useSharedValue(false);
+    const touchStartAnim = useSharedValue(0);
 
     useFrameCallback(() => {
-      anim.value += speed;
+      if (!isManual.value) {
+        anim.value += speed;
+      }
     }, true);
 
     useAnimatedReaction(
@@ -77,49 +96,100 @@ export const Marquee = React.memo(
       },
       []
     );
-    return (
-      <Animated.View
-        style={style}
-        onLayout={(ev) => {
-          parentWidth.value = ev.nativeEvent.layout.width;
-        }}
-        pointerEvents="box-none"
-      >
-        <Animated.View style={styles.row} pointerEvents="box-none">
-          {
-            // We are adding the text inside a ScrollView because in this way we
-            // ensure that its not going to "wrap".
-          }
-          <Animated.ScrollView
-            horizontal
-            style={styles.hidden}
-            pointerEvents="box-none"
-          >
-            <View
-              onLayout={(ev) => {
-                textWidth.value = ev.nativeEvent.layout.width;
-              }}
-            >
-              {children}
-            </View>
-          </Animated.ScrollView>
-          {cloneTimes > 0 &&
-            [...Array(cloneTimes).keys()].map((index) => {
-              return (
-                <AnimatedChild
-                  key={`clone-${index}`}
-                  index={index}
-                  anim={anim}
-                  textWidth={textWidth}
-                  spacing={spacing}
-                >
-                  {children}
-                </AnimatedChild>
-              );
-            })}
-        </Animated.View>
-      </Animated.View>
+
+    const scrollPan = React.useMemo(
+      () =>
+        Gesture.Pan()
+          .enabled(cloneTimes > 0)
+          .onTouchesDown(() => {
+            cancelAnimation(anim);
+            isManual.value = true;
+            touchStartAnim.value = anim.value;
+          })
+          .onUpdate((event) => {
+            const scollValue = Math.max(
+              0,
+              touchStartAnim.value - event.translationX
+            );
+            anim.value = scollValue;
+          })
+          .onEnd((event) => {
+            anim.value = withDecay(
+              {
+                velocity: -event.velocityX,
+                clamp: [0, Infinity],
+              },
+              () => {
+                isManual.value = false;
+              }
+            );
+          })
+          .onFinalize((event) => {
+            if (
+              State.FAILED === event.state ||
+              State.CANCELLED === event.state
+            ) {
+              isManual.value = false;
+            }
+          }),
+      [anim, cloneTimes, isManual, touchStartAnim]
     );
+
+    const render = () => {
+      return (
+        <Animated.View
+          style={style}
+          onLayout={(ev) => {
+            parentWidth.value = ev.nativeEvent.layout.width;
+          }}
+          pointerEvents="box-none"
+        >
+          <Animated.View style={styles.row} pointerEvents="box-none">
+            {
+              // We are adding the text inside a ScrollView because in this way we
+              // ensure that its not going to "wrap".
+            }
+            <Animated.ScrollView
+              horizontal
+              style={styles.hidden}
+              pointerEvents="box-none"
+            >
+              <View
+                onLayout={(ev) => {
+                  textWidth.value = ev.nativeEvent.layout.width;
+                }}
+              >
+                {children}
+              </View>
+            </Animated.ScrollView>
+            {cloneTimes > 0 &&
+              [...Array(cloneTimes).keys()].map((index) => {
+                return (
+                  <AnimatedChild
+                    key={`clone-${index}`}
+                    index={index}
+                    anim={anim}
+                    textWidth={textWidth}
+                    spacing={spacing}
+                  >
+                    {children}
+                  </AnimatedChild>
+                );
+              })}
+          </Animated.View>
+        </Animated.View>
+      );
+    };
+
+    if (enableManualScroll) {
+      return (
+        <GestureHandlerRootView>
+          <GestureDetector gesture={scrollPan}>{render()}</GestureDetector>
+        </GestureHandlerRootView>
+      );
+    }
+
+    return render();
   }
 );
 
