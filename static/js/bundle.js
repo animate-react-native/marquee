@@ -2060,7 +2060,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function isJest() {
-  return !!({"NODE_ENV":"development","PUBLIC_URL":"","APP_MANIFEST":{"name":"marquee","slug":"marquee","version":"1.0.0","orientation":"portrait","icon":"./assets/icon.png","userInterfaceStyle":"light","splash":{"image":"./assets/splash.png","resizeMode":"contain","backgroundColor":"#ffffff"},"web":{},"experiments":{"baseUrl":"marquee/"},"sdkVersion":"52.0.0","platforms":["ios","android","web"]},"EXPO_DEBUG":false,"PLATFORM":"web","WDS_SOCKET_PATH":"/_expo/ws"}).JEST_WORKER_ID;
+  return !!({"NODE_ENV":"development","PUBLIC_URL":"","APP_MANIFEST":{"name":"marquee","slug":"marquee","version":"1.0.0","orientation":"portrait","icon":"./assets/icon.png","userInterfaceStyle":"light","splash":{"image":"./assets/splash.png","resizeMode":"contain","backgroundColor":"#ffffff"},"web":{},"experiments":{"baseUrl":"/marquee"},"sdkVersion":"52.0.0","platforms":["ios","android","web"]},"EXPO_DEBUG":false,"PLATFORM":"web","WDS_SOCKET_PATH":"/_expo/ws"}).JEST_WORKER_ID;
 }
 function isChromeDebugger() {
   return (!__webpack_require__.g.nativeCallSyncHook || !!__webpack_require__.g.__REMOTEDEV__) && !__webpack_require__.g.RN$Bridgeless;
