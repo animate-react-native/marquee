@@ -12,7 +12,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <StatusBar hidden />
-      <Marquee spacing={20} speed={1}>
+      <Marquee spacing={20} speed={1} frameRate={60}>
         <Heading primary={primary}>
           @animatereactnative/marquee component
         </Heading>

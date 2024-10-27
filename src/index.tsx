@@ -39,6 +39,7 @@ const AnimatedChild = ({
 
 export type MarqueeProps = React.PropsWithChildren<{
   speed?: number;
+  frameRate?: number;
   spacing?: number;
   style?: ViewStyle;
 }>;
@@ -47,14 +48,22 @@ export type MarqueeProps = React.PropsWithChildren<{
  * Used to animate the given children in a horizontal manner.
  */
 export const Marquee = React.memo(
-  ({ speed = 1, children, spacing = 0, style }: MarqueeProps) => {
+  ({ speed = 1, children, spacing = 0, style, frameRate }: MarqueeProps) => {
     const parentWidth = useSharedValue(0);
     const textWidth = useSharedValue(0);
     const [cloneTimes, setCloneTimes] = React.useState(0);
     const anim = useSharedValue(0);
 
-    useFrameCallback(() => {
-      anim.value += speed;
+    const frameRateMs = frameRate ? 1000 / frameRate : null;
+
+    useFrameCallback((frameInfo) => {
+      if (frameInfo.timeSincePreviousFrame === null) return;
+
+      const frameDelta = frameRateMs
+        ? frameInfo.timeSincePreviousFrame / frameRateMs
+        : 1;
+
+      anim.value += speed * frameDelta;
     }, true);
 
     useAnimatedReaction(
