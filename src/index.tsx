@@ -1,5 +1,5 @@
 import * as React from 'react';
-import type { ViewStyle } from 'react-native';
+import type { LayoutRectangle, ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
 import { View } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
@@ -11,58 +11,119 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 
-const AnimatedChild = ({
-  index,
-  children,
-  anim,
-  textWidth,
-  spacing,
-}: React.PropsWithChildren<{
-  index: number;
-  anim: SharedValue<number>;
-  textWidth: SharedValue<number>;
-  spacing: number;
-}>) => {
-  const stylez = useAnimatedStyle(() => {
-    return {
-      position: 'absolute',
-      left: index * (textWidth.value + spacing),
-      transform: [
-        {
-          translateX: -(anim.value % (textWidth.value + spacing)),
-        },
-      ],
-    };
-  }, [index, spacing, textWidth]);
-  return <Animated.View style={stylez}>{children}</Animated.View>;
-};
-
+type MarqueeDirection = 'horizontal' | 'vertical';
 export type MarqueeProps = React.PropsWithChildren<{
   speed?: number;
   spacing?: number;
   style?: ViewStyle;
+  reverse?: boolean;
+  frameRate?: number;
+  direction?: MarqueeDirection;
 }>;
+
+const AnimatedChild = ({
+  index,
+  children,
+  anim,
+  textMeasurement,
+  spacing,
+  direction,
+}: React.PropsWithChildren<{
+  index: number;
+  anim: SharedValue<number>;
+  textMeasurement: SharedValue<LayoutRectangle>;
+  spacing: number;
+  direction: MarqueeDirection;
+}>) => {
+  const stylez = useAnimatedStyle(() => {
+    if (direction === 'vertical') {
+      return {
+        position: 'absolute',
+        top: (index - 1) * (textMeasurement.value.height + spacing),
+        transform: [
+          {
+            translateY: -(
+              anim.value %
+              (textMeasurement.value.height + spacing)
+            ),
+          },
+        ],
+      };
+    }
+    return {
+      position: 'absolute',
+      left: (index - 1) * (textMeasurement.value.width + spacing),
+      transform: [
+        {
+          translateX: -(anim.value % (textMeasurement.value.width + spacing)),
+        },
+      ],
+    };
+  }, [index, spacing, textMeasurement]);
+  return <Animated.View style={stylez}>{children}</Animated.View>;
+};
 
 /**
  * Used to animate the given children in a horizontal manner.
  */
 export const Marquee = React.memo(
-  ({ speed = 1, children, spacing = 0, style }: MarqueeProps) => {
-    const parentWidth = useSharedValue(0);
-    const textWidth = useSharedValue(0);
+  ({
+    speed = 1,
+    children,
+    spacing = 0,
+    style,
+    reverse,
+    frameRate,
+    direction = 'horizontal',
+  }: MarqueeProps) => {
+    const parentMeasurement = useSharedValue<LayoutRectangle>({
+      width: 0,
+      height: 0,
+      x: 0,
+      y: 0,
+    });
+    const textMeasurement = useSharedValue<LayoutRectangle>({
+      width: 0,
+      height: 0,
+      x: 0,
+      y: 0,
+    });
     const [cloneTimes, setCloneTimes] = React.useState(0);
     const anim = useSharedValue(0);
 
-    useFrameCallback(() => {
-      anim.value += speed;
+    const frameRateMs = frameRate ? 1000 / frameRate : null;
+
+    useFrameCallback((frameInfo) => {
+      if (frameInfo.timeSincePreviousFrame === null) return;
+
+      const frameDelta = frameRateMs
+        ? frameInfo.timeSincePreviousFrame / frameRateMs
+        : 1;
+
+      if (reverse) {
+        anim.value -= speed * frameDelta;
+      } else {
+        anim.value += speed * frameDelta;
+      }
     }, true);
 
     useAnimatedReaction(
       () => {
-        if (textWidth.value === 0 || parentWidth.value === 0) {
+        if (
+          textMeasurement.value.width === 0 ||
+          parentMeasurement.value.width === 0 ||
+          textMeasurement.value.height === 0 ||
+          parentMeasurement.value.height === 0
+        ) {
           return 0;
         }
-        return Math.round(parentWidth.value / textWidth.value) + 1;
+        return (
+          Math.round(
+            direction === 'horizontal'
+              ? parentMeasurement.value.width / textMeasurement.value.width
+              : parentMeasurement.value.height / textMeasurement.value.height
+          ) + 1
+        );
       },
       (v) => {
         if (v === 0) {
@@ -73,15 +134,16 @@ export const Marquee = React.memo(
         // Double this to cover the entire screen twice, in this way we can
         // reset the position of the first element when its going to move out
         // of the screen without any noticible glitch
-        runOnJS(setCloneTimes)(v * 2);
+        runOnJS(setCloneTimes)(v + 2);
       },
-      []
+      [direction]
     );
     return (
       <Animated.View
+        key={direction}
         style={style}
         onLayout={(ev) => {
-          parentWidth.value = ev.nativeEvent.layout.width;
+          parentMeasurement.value = ev.nativeEvent.layout;
         }}
         pointerEvents="box-none"
       >
@@ -91,13 +153,13 @@ export const Marquee = React.memo(
             // ensure that its not going to "wrap".
           }
           <Animated.ScrollView
-            horizontal
+            horizontal={direction === 'horizontal'}
             style={styles.hidden}
             pointerEvents="box-none"
           >
             <View
               onLayout={(ev) => {
-                textWidth.value = ev.nativeEvent.layout.width;
+                textMeasurement.value = ev.nativeEvent.layout;
               }}
             >
               {children}
@@ -110,8 +172,9 @@ export const Marquee = React.memo(
                   key={`clone-${index}`}
                   index={index}
                   anim={anim}
-                  textWidth={textWidth}
+                  textMeasurement={textMeasurement}
                   spacing={spacing}
+                  direction={direction}
                 >
                   {children}
                 </AnimatedChild>

@@ -18,6 +18,7 @@ export function Box({
         height: size,
         borderRadius: 16,
         marginRight: spacing,
+        marginBottom: spacing,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: primary ? '#F0F464' : '#1f1f1f',
