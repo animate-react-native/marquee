@@ -1,6 +1,6 @@
 {
   "name": "@animatereactnative/marquee",
-  "version": "0.3.0",
+  "version": "0.2.0",
   "description": "A React Native Marquee component",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -150,6 +150,7 @@
     "trailingComma": "es5",
     "useTabs": false
   },
+  "packageManager": "yarn@3.6.1",
   "react-native-builder-bob": {
     "source": "src",
     "output": "lib",
