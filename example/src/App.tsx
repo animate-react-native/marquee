@@ -1,14 +1,20 @@
 import * as React from 'react';
 
-import { Marquee } from '@animatereactnative/marquee';
+import { Marquee, type MarqueeRef } from '@animatereactnative/marquee';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
+import { Button, StyleSheet, View } from 'react-native';
+import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 import { Box } from './components/Box';
 import { Heading } from './components/Heading';
 
 const primary = true;
 
-export default function App() {
+function App() {
+  return <Example />;
+}
+
+function Example() {
+  const ref = React.useRef<MarqueeRef>(null);
   return (
     <View style={styles.container}>
       <StatusBar hidden />
@@ -25,6 +31,7 @@ export default function App() {
         <Box size={50} primary={primary} />
       </Marquee>
       <Marquee
+        ref={ref}
         spacing={10}
         speed={4}
         style={{ marginTop: 12 }}
@@ -83,6 +90,20 @@ export default function App() {
           );
         })}
       </View>
+      <View style={{ flexDirection: 'row', gap: 4, justifyContent: 'center' }}>
+        <Button
+          title="Start"
+          onPress={() => {
+            ref.current?.start();
+          }}
+        />
+        <Button
+          title="Stop"
+          onPress={() => {
+            ref.current?.stop();
+          }}
+        />
+      </View>
     </View>
   );
 }
@@ -100,3 +121,5 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
 });
+
+export default gestureHandlerRootHOC(App);
