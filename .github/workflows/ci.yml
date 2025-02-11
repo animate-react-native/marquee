@@ -56,6 +56,6 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
 
-      - name: Build example for Web and Deploy
+      - name: Build example for Web
         run: |
-          yarn --cwd example deploy
+          yarn --cwd example expo export:web
