@@ -50,6 +50,7 @@ export function Example() {
 | `reverse`   | Determine if the animation should be reversed or not. Based on `direction`, `reverse` means left-to-right, right-to-left, top-to-bottom, bottom-to-top | NO       | `boolean`              | false                        |
 | `direction` | Direction of the animation                                                                                                                             | NO       | `"horizontal"`         | `"vertical" or "horizontal"` |
 | `style`     | View style to be applied to Marquee container.                                                                                                         | NO       | `StyleProp<ViewStyle>` |                              |
+| `position`  | A shared value that you can pass and it will be modified when the marquee runs. Useful if you want to interpolate or run any additional animations     | NO       | `SharedValue<number>`  |                              |
 
 ## Contributing
 

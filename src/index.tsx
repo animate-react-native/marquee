@@ -1,7 +1,6 @@
 import * as React from 'react';
 import type { LayoutRectangle, ViewStyle } from 'react-native';
-import { StyleSheet } from 'react-native';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import Animated, {
   runOnJS,
@@ -19,6 +18,7 @@ export type MarqueeProps = React.PropsWithChildren<{
   reverse?: boolean;
   frameRate?: number;
   direction?: MarqueeDirection;
+  position?: SharedValue<number>;
 }>;
 
 const AnimatedChild = ({
@@ -75,6 +75,7 @@ export const Marquee = React.memo(
     reverse,
     frameRate,
     direction = 'horizontal',
+    position,
   }: MarqueeProps) => {
     const parentMeasurement = useSharedValue<LayoutRectangle>({
       width: 0,
@@ -104,6 +105,9 @@ export const Marquee = React.memo(
         anim.value -= speed * frameDelta;
       } else {
         anim.value += speed * frameDelta;
+      }
+      if (position) {
+        position.value = anim.value;
       }
     }, true);
 
