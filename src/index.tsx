@@ -126,7 +126,7 @@ export const Marquee = React.memo(
         if (position) {
           position.value = anim.value;
         }
-      }, [anim.value]);
+      });
 
       useAnimatedReaction(
         () => {
