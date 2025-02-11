@@ -1,6 +1,6 @@
 {
   "name": "@animatereactnative/marquee",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "A React Native Marquee component",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
