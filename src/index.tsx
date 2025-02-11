@@ -7,6 +7,7 @@ import Animated, {
   runOnJS,
   useAnimatedReaction,
   useAnimatedStyle,
+  useDerivedValue,
   useFrameCallback,
   useSharedValue,
   withDecay,
@@ -119,10 +120,13 @@ export const Marquee = React.memo(
         } else {
           anim.value += speed * frameDelta;
         }
+      }, true);
+
+      useDerivedValue(() => {
         if (position) {
           position.value = anim.value;
         }
-      }, true);
+      }, [anim.value]);
 
       useAnimatedReaction(
         () => {
