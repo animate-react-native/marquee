@@ -1,10 +1,10 @@
 import * as React from 'react';
 
-import { StyleSheet, View } from 'react-native';
 import { Marquee } from '@animatereactnative/marquee';
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, View } from 'react-native';
 import { Box } from './components/Box';
 import { Heading } from './components/Heading';
-import { StatusBar } from 'expo-status-bar';
 
 const primary = true;
 
@@ -46,7 +46,14 @@ export default function App() {
           })}
         </View>
       </Marquee>
-      <View style={{ flexDirection: 'row', height: 300, padding: 10 }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          height: 300,
+          padding: 10,
+          overflow: 'hidden',
+        }}
+      >
         {[...Array(3).keys()].map((i) => {
           return (
             <Marquee
