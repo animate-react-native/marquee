@@ -12,6 +12,8 @@ import Animated, {
   useSharedValue,
   withDecay,
 } from 'react-native-reanimated';
+import {useFocusEffect} from '@react-navigation/native';
+
 
 type MarqueeDirection = 'horizontal' | 'vertical';
 export type MarqueeProps = React.PropsWithChildren<{
@@ -105,7 +107,7 @@ export const Marquee = React.memo(
       });
       const [cloneTimes, setCloneTimes] = React.useState(0);
       const anim = useSharedValue(0);
-
+      
       const frameRateMs = frameRate ? 1000 / frameRate : null;
 
       const frameCallback = useFrameCallback((frameInfo) => {
@@ -196,6 +198,18 @@ export const Marquee = React.memo(
             }
           );
         });
+
+      // detect focus
+      useFocusEffect(
+        React.useCallback(() => {
+          frameCallback.setActive(true);
+
+          return () => {
+            frameCallback.setActive(false);
+            anim.value = 0;
+          };
+        }, []),
+      );
 
       return (
         <Animated.View
