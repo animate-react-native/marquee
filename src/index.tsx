@@ -23,6 +23,7 @@ export type MarqueeProps = React.PropsWithChildren<{
   direction?: MarqueeDirection;
   position?: SharedValue<number>;
   withGesture?: boolean;
+  autoStart?: boolean;
 }>;
 
 export type MarqueeRef = {
@@ -88,6 +89,7 @@ export const Marquee = React.memo(
         direction = 'horizontal',
         position,
         withGesture = true,
+        autoStart = true,
       },
       ref
     ) => {
@@ -120,7 +122,7 @@ export const Marquee = React.memo(
         } else {
           anim.value += speed * frameDelta;
         }
-      }, true);
+      }, autoStart);
 
       useDerivedValue(() => {
         if (position) {
