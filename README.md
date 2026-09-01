@@ -1,3 +1,5 @@
+![@animatereactnative/marquee](https://raw.githubusercontent.com/animate-react-native/marquee/main/docs/banner.png)
+
 <div align="center">
 <h1>React Native Marquee</h1>
 
