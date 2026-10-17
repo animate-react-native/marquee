@@ -48,6 +48,7 @@ const AnimatedChild = ({
   const stylez = useAnimatedStyle(() => {
     if (direction === 'vertical') {
       return {
+        width: '100%',
         position: 'absolute',
         top: (index - 1) * (textMeasurement.value.height + spacing),
         transform: [
